@@ -60,7 +60,7 @@ JWT lifetime: `JWT_TTL=4320` (3 days), `JWT_REFRESH_TTL=20160` (14 days). Refres
 
 | File | Role |
 |---|---|
-| `ecosystem.config.js` | PM2 spec: `hengtai-backend` runs `php8.4 artisan serve --host=127.0.0.1 --port=8081`; `hengtai-frontend` runs `./node_modules/.bin/next dev -p 3111 -H 127.0.0.1` |
+| `ecosystem.config.js` | PM2 spec: `hengtai-backend` runs `php8.4 artisan serve --host=127.0.0.1 --port=8081`; `hengtai-frontend` runs `./node_modules/.bin/next start -p 3111 -H 127.0.0.1` (**production mode** — frontend code changes require `npm run build` + restart, NOT hot-reload) |
 | `ai.cxfortune.com.conf` | nginx: terminates HTTPS, proxies `/api`, `/admin/*` to 8081, everything else to 3111. **`/api/ai/chat-stream` has `proxy_buffering off; proxy_cache off; proxy_read_timeout 300s`** for SSE |
 | `/etc/nginx/sites-enabled/ai.cxfortune.com` | symlink to deployed copy of the conf above |
 | Cloudflare | terminates TLS for browsers; **must enable WebSockets in Network settings** for Next.js dev HMR to work |
@@ -121,12 +121,19 @@ npx shadcn@latest add [component]                    # add UI component
 Open `miniprogram/` in WeChat DevTools. AppID is pre-filled in `project.config.json`. For local development, `project.private.config.json` disables `urlCheck` so requests to `ai.cxfortune.com` work. **Before real-device preview**: add `https://ai.cxfortune.com` to all four whitelists in mp.weixin.qq.com → 开发管理 → 服务器域名 (`request`, `uploadFile`, `downloadFile`, `socket` not needed).
 
 ### PM2 (production processes)
+`pm2` is not on PATH — invoke via `npx pm2 ...` (or use the absolute path).
 ```bash
-pm2 start ecosystem.config.js
-pm2 list
-pm2 restart hengtai-backend
-pm2 logs hengtai-frontend --lines 50
-pm2 save                                             # persist process list across reboots
+npx pm2 start ecosystem.config.js
+npx pm2 list
+npx pm2 restart hengtai-backend
+npx pm2 logs hengtai-frontend --lines 50
+npx pm2 save                                         # persist process list across reboots
+```
+
+### Deploying a frontend change
+Frontend runs `next start` (production), so source edits do NOT hot-reload. The full cycle is:
+```bash
+cd frontend && npm run build && cd .. && npx pm2 restart hengtai-frontend
 ```
 
 ## Patterns to follow when extending

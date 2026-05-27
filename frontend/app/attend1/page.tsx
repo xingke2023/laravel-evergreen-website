@@ -102,7 +102,7 @@ export default function AttendPage() {
       <header style={{ background: NAVY, padding: '0 20px', height: 56, display: 'flex', alignItems: 'center', gap: 12 }}>
         <div>
           <div style={{ color: '#fff', fontWeight: 300, fontSize: 22, lineHeight: 1.1, letterSpacing: 1 }}>盈信家辦</div>
-          <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, letterSpacing: 2 }}>EVERYGREEN</div>
+          <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, letterSpacing: 2 }}>EVERGREEN</div>
         </div>
       </header>
 
